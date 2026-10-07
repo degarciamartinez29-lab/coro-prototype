@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>
+body{margin:0;background:#E9E7E2;font-family:'Lexend',system-ui,sans-serif;color:#141414;-webkit-font-smoothing:antialiased}
+a{color:#141414}a:hover{color:#6b6b6b}
+button{font-family:inherit;cursor:pointer}
+*::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;box-sizing:border-box">
+  <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#555">
+    <span style="font-weight:600;color:#141414">coro</span><span>·</span><span>{{ stepLabel }}</span>
+  </div>
+
+  <div style="zoom:{{ zoom }};position:relative;width:402px;height:874px;border-radius:52px;background:#fff;overflow:hidden;box-shadow:0 0 0 10px #141414,0 30px 60px rgba(0,0,0,.25);flex-shrink:0">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;background:#fff;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px">
+      <span style="font-weight:600;font-size:16px">{{ clock }}</span>
+      <div style="position:absolute;left:50%;top:11px;transform:translateX(-50%);width:124px;height:36px;border-radius:20px;background:#0a0a0a"></div>
+      <div style="display:flex;gap:6px;align-items:center;font-size:16px"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-bold ph-wifi-high"></i><i class="ph-fill ph-battery-full" style="font-size:22px"></i></div>
+    </div>
+
+    <div style="position:absolute;inset:54px 0 0 0;overflow-y:auto;padding:16px 16px 40px;box-sizing:border-box;display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:32px;font-weight:600;letter-spacing:-0.5px">Piso Goya</span><i class="ph ph-caret-down" style="font-size:16px;border:1.5px solid #141414;border-radius:6px;padding:2px"></i></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button onClick="{{ reset }}" title="Reset demo" style="background:none;border:none;padding:0;font-size:28px;color:#141414;display:flex"><i class="ph ph-dots-three-circle"></i></button>
+          <img src="assets/avatar.png" style="width:40px;height:40px;border-radius:50%;object-fit:cover">
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:18px;font-weight:500">Scenes <i class="ph ph-caret-circle-right" style="font-size:20px"></i></div>
+        <div style="display:flex;gap:10px;margin-right:-16px;overflow-x:auto">
+          <button onClick="{{ openCena }}" style="display:flex;align-items:center;gap:10px;background:#F3F3F3;border:none;border-radius:10px;padding:8px 18px 8px 8px;font-size:15px;flex-shrink:0" style-active="background:#E6E6E6"><span style="width:36px;height:36px;border-radius:50%;background:#141414;color:#fff;display:grid;place-items:center;font-size:18px"><i class="ph ph-cooking-pot"></i></span>Dinner</button>
+          <button onClick="{{ otherScene }}" style="display:flex;align-items:center;gap:10px;background:#F3F3F3;border:none;border-radius:10px;padding:8px 18px 8px 8px;font-size:15px;flex-shrink:0"><span style="width:36px;height:36px;border-radius:50%;background:#141414;color:#fff;display:grid;place-items:center;font-size:18px"><i class="ph ph-book-open"></i></span>Reading</button>
+          <button onClick="{{ otherScene }}" style="display:flex;align-items:center;gap:10px;background:#F3F3F3;border:none;border-radius:10px;padding:8px 18px 8px 8px;font-size:15px;flex-shrink:0"><span style="width:36px;height:36px;border-radius:50%;background:#141414;color:#fff;display:grid;place-items:center;font-size:18px"><i class="ph ph-bathtub"></i></span>Relaxing shower</button>
+        </div>
+        <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #141414;border-radius:10px;padding:10px 12px">
+            <i class="ph ph-clock-countdown" style="font-size:20px;color:#C99A1E"></i>
+            <div style="flex:1;display:flex;flex-direction:column;gap:2px;font-size:13px"><span style="font-weight:500">Dinner · pending</span><span style="color:#6b6b6b">{{ pendingText }}</span></div>
+            <sc-if value="{{ canSimulate }}"><button onClick="{{ simulate }}" style="background:#141414;color:#fff;border:none;border-radius:8px;padding:7px 10px;font-size:12px">{{ simulateLabel }}</button></sc-if>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:18px;font-weight:500">Cameras <i class="ph ph-caret-circle-right" style="font-size:20px"></i></div>
+        <div style="position:relative;border-radius:12px;overflow:hidden;height:182px"><img src="assets/camera.png" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:18px;font-weight:500">Living room</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div onClick="{{ lamp.onClick }}" style="display:flex;align-items:center;gap:14px;border-radius:10px;padding:16px;height:68px;box-sizing:border-box;cursor:pointer;transition:background .3s,color .3s;background:{{ lamp.bg }};color:{{ lamp.fg }}">
+            <i class="ph ph-lamp" style="font-size:24px;color:{{ lamp.ic }}"></i>
+            <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">Lamp</span><span style="font-size:13px;color:{{ lamp.sub }}">{{ lamp.value }}</span></div>
+            <sc-if value="{{ lamp.locked }}"><i class="ph ph-lock-simple" style="font-size:20px"></i></sc-if>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;border-radius:10px;padding:16px;height:68px;box-sizing:border-box;background:#F3F3F3">
+            <i class="ph ph-television-simple" style="font-size:24px"></i>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">Living room TV</span><span style="font-size:13px;color:#8A8A8A">Off</span></div>
+          </div>
+          <div onClick="{{ spk.onClick }}" style="grid-column:1 / span 2;display:flex;align-items:center;gap:14px;border-radius:10px;padding:10px 10px 10px 16px;box-sizing:border-box;background:#F3F3F3;cursor:pointer">
+            <i class="ph ph-speaker-hifi" style="font-size:24px"></i>
+            <div style="flex:1;display:flex;flex-direction:column;gap:4px;min-width:0">
+              <span style="font-size:14px;font-weight:500">Speaker 1</span>
+              <span style="font-size:12px;color:#8A8A8A;display:flex;gap:4px;align-items:center"><i class="ph {{ spk.subIcon }}"></i>{{ spk.sub }}</span>
+              <div style="height:3px;border-radius:2px;background:#DADADA;margin-top:3px"><div style="height:3px;border-radius:2px;background:#141414;transition:width .6s;width:{{ spk.bar }}"></div></div>
+            </div>
+            <sc-if value="{{ spk.locked }}"><img src="assets/album.png" style="width:48px;height:48px;border-radius:8px;object-fit:cover"></sc-if>
+            <sc-if value="{{ spk.unlocked }}"><div style="width:48px;height:48px;border-radius:8px;background:#141414;display:grid;place-items:center"><i class="ph-fill ph-music-notes" style="font-size:22px;color:{{ spk.noteColor }}"></i></div></sc-if>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:18px;font-weight:500">Kitchen</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div onClick="{{ kit.onClick }}" style="display:flex;align-items:center;gap:14px;border-radius:10px;padding:16px;height:68px;box-sizing:border-box;cursor:pointer;transition:background .3s,color .3s;background:{{ kit.bg }};color:{{ kit.fg }}">
+            <i class="ph ph-lamp-pendant" style="font-size:24px;color:{{ kit.ic }}"></i>
+            <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">Kitchen light</span><span style="font-size:13px;color:{{ kit.sub }}">{{ kit.value }}</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;border-radius:10px;padding:16px;height:68px;box-sizing:border-box;background:#F3F3F3">
+            <i class="ph ph-television-simple" style="font-size:24px"></i>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">Kitchen TV</span><span style="font-size:13px;color:#8A8A8A">Off</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:18px;font-weight:500">Bathroom</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="display:flex;align-items:center;gap:14px;border-radius:10px;padding:16px;height:68px;box-sizing:border-box;background:#F3F3F3">
+            <i class="ph ph-lamp-pendant" style="font-size:24px"></i>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">Bathroom light</span><span style="font-size:13px;color:#8A8A8A">Off</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div onClick="{{ backdropClick }}" style="position:absolute;inset:0;z-index:10;background:rgba(20,20,20,.38);transition:opacity .3s;opacity:{{ dimOp }};pointer-events:{{ dimPE }}"></div>
+
+    <!-- Step 1 · Alert -->
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;transition:transform .38s cubic-bezier(.2,.8,.2,1);pointer-events:{{ alertPE }};transform:{{ alertTf }}">
+      <div style="background:#fff;border-radius:22px 22px 0 0;padding:20px 20px 30px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -10px 40px rgba(0,0,0,.15)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="width:44px;height:44px;border-radius:9px;background:#EDC14E;display:grid;place-items:center"><i class="ph-bold ph-lock-simple" style="font-size:24px;color:#fff"></i></div>
+          <button onClick="{{ close }}" style="width:30px;height:30px;border-radius:8px;border:1.5px solid #141414;background:#fff;display:grid;place-items:center;font-size:16px"><i class="ph-bold ph-x"></i></button>
+        </div>
+        <div style="font-size:18px;font-weight:600">“Dinner” clashes with two requests</div>
+        <div style="font-size:14px;line-height:1.45;color:#2a2a2a;text-wrap:pretty">The living room lamp and the speaker are locked by your housemates. The kitchen light is free.</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="width:20px;height:20px;border-radius:50%;background:#F1C9A5;display:grid;place-items:center;font-size:10px;font-weight:600">N</span><span><b style="font-weight:500">Lamp</b> · Nora, since 21:25, no end time</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="width:20px;height:20px;border-radius:50%;background:#C7D3F0;display:grid;place-items:center;font-size:10px;font-weight:600">D</span><span><b style="font-weight:500">Speaker 1</b> · Dani, quiet until 22:00</span></div>
+        </div>
+        <sc-if value="{{ showMessage }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:10px;background:#EEF4FD;border:1px solid #A9C2EE;border-radius:8px;padding:10px 12px;font-size:13px"><i class="ph ph-note-pencil" style="font-size:20px;color:#3B6FD1"></i><span><b style="font-weight:600">Dani</b>: Hey guys! Taking a nap until 10pm, ok?</span></div>
+        </sc-if>
+        <div style="font-size:14px;color:#2a2a2a;margin-top:4px">What would you like to do?</div>
+        <div style="display:grid;grid-template-columns:1fr 1.25fr;gap:10px">
+          <button onClick="{{ unlockAll }}" style="height:46px;border-radius:9px;border:1.5px solid #141414;background:#fff;font-size:14px;font-weight:500" style-active="background:#F3F3F3">Unlock all</button>
+          <button onClick="{{ goSelect }}" style="height:46px;border-radius:9px;border:none;background:#141414;color:#fff;font-size:14px;font-weight:500" style-active="background:#333">Choose one by one</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 · Choose -->
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:12;background:#fff;border-radius:22px 22px 0 0;display:flex;flex-direction:column;transition:transform .38s cubic-bezier(.2,.8,.2,1);transform:{{ selTf }};box-shadow:0 -10px 40px rgba(0,0,0,.15)">
+      <div style="padding:20px 20px 12px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="width:44px;height:44px;border-radius:9px;background:#EDC14E;display:grid;place-items:center"><i class="ph-bold ph-lock-simple" style="font-size:24px;color:#fff"></i></div>
+          <button onClick="{{ backToAlert }}" style="width:30px;height:30px;border-radius:8px;border:1.5px solid #141414;background:#fff;display:grid;place-items:center;font-size:16px"><i class="ph-bold ph-x"></i></button>
+        </div>
+        <div style="font-size:18px;font-weight:600;margin-top:10px">Choose what changes and when</div>
+        <div style="font-size:14px;color:#6b6b6b">Your scene: <b style="font-weight:500;color:#141414">Dinner</b> · lights at 30 %, music at 35 %</div>
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:18px"><span style="font-size:20px;font-weight:500">Living room</span><span style="font-size:12px;font-weight:500">When</span></div>
+        <sc-for list="{{ rowsSalon }}" as="r" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:8px;padding:10px 0">
+            <div style="align-self:flex-start;margin-left:44px;display:flex;gap:6px;align-items:center;background:#F0F0F0;border-radius:6px;padding:3px 8px 3px 4px;font-size:11px;color:#555">
+              <span style="width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:600;color:#141414;background:{{ r.avColor }}">{{ r.avInitial }}</span>
+              <span>{{ r.pillPre }} <b style="font-weight:600;color:#141414">{{ r.by }}</b> {{ r.pillRest }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <button onClick="{{ r.onToggle }}" style="width:30px;height:30px;flex-shrink:0;border-radius:8px;display:grid;place-items:center;padding:0;transition:background .2s,border-color .2s;border:2px solid {{ r.cbBorder }};background:{{ r.cbBg }}"><i class="ph-bold ph-check" style="color:#fff;font-size:16px;transition:transform .25s cubic-bezier(.3,1.6,.5,1),opacity .2s;opacity:{{ r.cbOp }};transform:{{ r.cbTf }}"></i></button>
+              <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0">
+                <i class="ph {{ r.icon }}" style="font-size:22px"></i>
+                <div style="display:flex;flex-direction:column"><span style="font-size:14px;font-weight:500;white-space:nowrap">{{ r.name }}</span><span style="font-size:11px;color:#6b6b6b">{{ r.from }}</span></div>
+              </div>
+              <i class="ph ph-arrow-right" style="font-size:14px;color:#B5B5B5"></i>
+              <div onClick="{{ r.onMode }}" style="flex:1;display:flex;align-items:center;gap:8px;min-width:0;cursor:pointer;border-radius:8px;margin:-4px;padding:4px;transition:opacity .2s,background .2s;opacity:{{ r.toOp }};background:{{ r.modeBg }}">
+                <i class="ph {{ r.icon }}" style="font-size:22px"></i>
+                <div style="display:flex;flex-direction:column"><span style="font-size:14px;font-weight:500;white-space:nowrap">{{ r.name }}</span><span style="font-size:11px;color:#141414;display:flex;align-items:center;gap:3px;border-bottom:1px dashed #9A9A9A;align-self:flex-start">{{ r.to }}<i class="ph ph-pencil-simple" style="font-size:10px"></i></span></div>
+              </div>
+              <button onClick="{{ r.onClock }}" style="display:flex;flex-direction:column;align-items:center;gap:1px;background:none;border:none;padding:0;width:44px;flex-shrink:0;transition:opacity .2s;opacity:{{ r.toOp }};color:{{ r.clockColor }}"><i class="ph {{ r.clockIcon }}" style="font-size:24px"></i><span style="font-size:10px;white-space:nowrap">{{ r.when }}</span></button>
+            </div>
+            <sc-if value="{{ r.modeOpen }}">
+              <div style="margin-left:42px;display:flex;flex-direction:column;gap:12px;background:#F6F6F6;border-radius:12px;padding:12px 14px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:12px;color:#6b6b6b">{{ r.modeLabel }}</span>
+                  <span style="font-size:12px;color:#6b6b6b">In “Dinner”: {{ r.sceneVal }} %</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:14px">
+                  <i class="ph {{ r.modeIcon }}" style="font-size:24px"></i>
+                  <input type="range" min="0" max="100" step="5" value="{{ r.target }}" onChange="{{ r.onRange }}" style="flex:1;accent-color:#141414;height:4px">
+                  <span style="font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;min-width:72px;text-align:right">{{ r.target }} %</span>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ r.presets }}" as="q">
+                    <button onClick="{{ q.onClick }}" style="border-radius:20px;padding:5px 11px;font-size:12px;border:1.5px solid #141414;background:{{ q.bg }};color:{{ q.fg }}">{{ q.label }}</button>
+                  </sc-for>
+                </div>
+                <button onClick="{{ r.onModeDone }}" style="height:40px;border-radius:8px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:500">Use {{ r.target }} %</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.open }}">
+              <div style="margin-left:42px;display:flex;flex-direction:column;gap:12px;background:#F6F6F6;border-radius:12px;padding:12px 14px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:12px;color:#6b6b6b">Schedule to turn on at</span>
+                  <sc-if value="{{ r.isSched }}"><button onClick="{{ r.onClear }}" style="font-size:12px;border:none;background:none;text-decoration:underline;padding:0;color:#141414">Clear time</button></sc-if>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <button onClick="{{ r.onMinus }}" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #141414;background:#fff;display:grid;place-items:center;padding:0;font-size:16px" style-active="background:#EDEDED"><i class="ph-bold ph-minus"></i></button>
+                  <div style="display:flex;align-items:center;gap:8px"><i class="ph ph-clock" style="font-size:24px"></i><span style="font-size:32px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-0.5px">{{ r.draft }}</span></div>
+                  <button onClick="{{ r.onPlus }}" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #141414;background:#fff;display:grid;place-items:center;padding:0;font-size:16px" style-active="background:#EDEDED"><i class="ph-bold ph-plus"></i></button>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ r.quick }}" as="q">
+                    <button onClick="{{ q.onClick }}" style="border-radius:20px;padding:5px 11px;font-size:12px;border:1.5px solid #141414;background:{{ q.bg }};color:{{ q.fg }}">{{ q.label }}</button>
+                  </sc-for>
+                </div>
+                <button onClick="{{ r.onConfirm }}" style="height:40px;border-radius:8px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:500">Schedule for {{ r.draft }}</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.hasNote }}">
+              <div style="margin-left:42px;display:flex;gap:6px;align-items:center;font-size:12px;color:#9A6F00"><i class="ph ph-warning-circle" style="font-size:15px"></i>{{ r.note }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <div style="font-size:20px;font-weight:500;margin-top:12px">Kitchen</div>
+        <sc-for list="{{ rowsCocina }}" as="r" hint-placeholder-count="1">
+          <div style="display:flex;flex-direction:column;gap:8px;padding:10px 0">
+            <div style="align-self:flex-start;margin-left:44px;display:flex;gap:6px;align-items:center;background:#F0F0F0;border-radius:6px;padding:3px 8px 3px 4px;font-size:11px;color:#555">
+              <span style="width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:600;color:#141414;background:{{ r.avColor }}">{{ r.avInitial }}</span>
+              <span>{{ r.pillPre }} <b style="font-weight:600;color:#141414">{{ r.by }}</b> {{ r.pillRest }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <button onClick="{{ r.onToggle }}" style="width:30px;height:30px;flex-shrink:0;border-radius:8px;display:grid;place-items:center;padding:0;transition:background .2s,border-color .2s;border:2px solid {{ r.cbBorder }};background:{{ r.cbBg }}"><i class="ph-bold ph-check" style="color:#fff;font-size:16px;transition:transform .25s cubic-bezier(.3,1.6,.5,1),opacity .2s;opacity:{{ r.cbOp }};transform:{{ r.cbTf }}"></i></button>
+              <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0">
+                <i class="ph {{ r.icon }}" style="font-size:22px"></i>
+                <div style="display:flex;flex-direction:column"><span style="font-size:14px;font-weight:500;white-space:nowrap">{{ r.name }}</span><span style="font-size:11px;color:#6b6b6b">{{ r.from }}</span></div>
+              </div>
+              <i class="ph ph-arrow-right" style="font-size:14px;color:#B5B5B5"></i>
+              <div onClick="{{ r.onMode }}" style="flex:1;display:flex;align-items:center;gap:8px;min-width:0;cursor:pointer;border-radius:8px;margin:-4px;padding:4px;transition:opacity .2s,background .2s;opacity:{{ r.toOp }};background:{{ r.modeBg }}">
+                <i class="ph {{ r.icon }}" style="font-size:22px"></i>
+                <div style="display:flex;flex-direction:column"><span style="font-size:14px;font-weight:500;white-space:nowrap">{{ r.name }}</span><span style="font-size:11px;color:#141414;display:flex;align-items:center;gap:3px;border-bottom:1px dashed #9A9A9A;align-self:flex-start">{{ r.to }}<i class="ph ph-pencil-simple" style="font-size:10px"></i></span></div>
+              </div>
+              <button onClick="{{ r.onClock }}" style="display:flex;flex-direction:column;align-items:center;gap:1px;background:none;border:none;padding:0;width:44px;flex-shrink:0;transition:opacity .2s;opacity:{{ r.toOp }};color:{{ r.clockColor }}"><i class="ph {{ r.clockIcon }}" style="font-size:24px"></i><span style="font-size:10px;white-space:nowrap">{{ r.when }}</span></button>
+            </div>
+            <sc-if value="{{ r.modeOpen }}">
+              <div style="margin-left:42px;display:flex;flex-direction:column;gap:12px;background:#F6F6F6;border-radius:12px;padding:12px 14px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:12px;color:#6b6b6b">{{ r.modeLabel }}</span>
+                  <span style="font-size:12px;color:#6b6b6b">In “Dinner”: {{ r.sceneVal }} %</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:14px">
+                  <i class="ph {{ r.modeIcon }}" style="font-size:24px"></i>
+                  <input type="range" min="0" max="100" step="5" value="{{ r.target }}" onChange="{{ r.onRange }}" style="flex:1;accent-color:#141414;height:4px">
+                  <span style="font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;min-width:72px;text-align:right">{{ r.target }} %</span>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ r.presets }}" as="q">
+                    <button onClick="{{ q.onClick }}" style="border-radius:20px;padding:5px 11px;font-size:12px;border:1.5px solid #141414;background:{{ q.bg }};color:{{ q.fg }}">{{ q.label }}</button>
+                  </sc-for>
+                </div>
+                <button onClick="{{ r.onModeDone }}" style="height:40px;border-radius:8px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:500">Use {{ r.target }} %</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.open }}">
+              <div style="margin-left:42px;display:flex;flex-direction:column;gap:12px;background:#F6F6F6;border-radius:12px;padding:12px 14px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:12px;color:#6b6b6b">Schedule to turn on at</span>
+                  <sc-if value="{{ r.isSched }}"><button onClick="{{ r.onClear }}" style="font-size:12px;border:none;background:none;text-decoration:underline;padding:0;color:#141414">Clear time</button></sc-if>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <button onClick="{{ r.onMinus }}" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #141414;background:#fff;display:grid;place-items:center;padding:0;font-size:16px" style-active="background:#EDEDED"><i class="ph-bold ph-minus"></i></button>
+                  <div style="display:flex;align-items:center;gap:8px"><i class="ph ph-clock" style="font-size:24px"></i><span style="font-size:32px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-0.5px">{{ r.draft }}</span></div>
+                  <button onClick="{{ r.onPlus }}" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #141414;background:#fff;display:grid;place-items:center;padding:0;font-size:16px" style-active="background:#EDEDED"><i class="ph-bold ph-plus"></i></button>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ r.quick }}" as="q">
+                    <button onClick="{{ q.onClick }}" style="border-radius:20px;padding:5px 11px;font-size:12px;border:1.5px solid #141414;background:{{ q.bg }};color:{{ q.fg }}">{{ q.label }}</button>
+                  </sc-for>
+                </div>
+                <button onClick="{{ r.onConfirm }}" style="height:40px;border-radius:8px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:500">Schedule for {{ r.draft }}</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding:12px 20px 30px;border-top:1px solid #EFEFEF;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:12px;color:#6b6b6b">{{ selSummary }}</div>
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:10px">
+          <button onClick="{{ backToAlert }}" style="height:48px;border-radius:9px;border:1.5px solid #141414;background:#fff;font-size:14px;font-weight:500">Cancel</button>
+          <button onClick="{{ applySel }}" style="height:48px;border-radius:9px;border:none;background:#141414;color:#fff;font-size:14px;font-weight:500;transition:opacity .2s;opacity:{{ applyOp }}">{{ applyLabel }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 · Result -->
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:13;background:#fff;border-radius:22px 22px 0 0;padding:22px 20px 30px;display:flex;flex-direction:column;gap:14px;transition:transform .4s cubic-bezier(.2,.8,.2,1);transform:{{ resTf }};box-shadow:0 -10px 40px rgba(0,0,0,.15)">
+      <div style="width:44px;height:44px;border-radius:9px;background:#141414;display:grid;place-items:center"><i class="ph-bold ph-check" style="font-size:24px;color:#EDC14E"></i></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:22px;font-weight:600;letter-spacing:-0.3px">{{ resTitle }}</div>
+        <div style="font-size:14px;color:#6b6b6b">{{ resSub }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ resRows }}" as="x" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0F0F0">
+            <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:{{ x.bg }};color:{{ x.ic }}"><i class="ph {{ x.icon }}" style="font-size:22px"></i></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+              <span style="font-size:14px;font-weight:500">{{ x.name }} <span style="font-weight:400;color:#6b6b6b">· {{ x.value }}</span></span>
+              <span style="font-size:12px;color:#6b6b6b;text-wrap:pretty">{{ x.detail }}</span>
+            </div>
+            <span style="font-size:11px;font-weight:500;border-radius:20px;padding:4px 9px;white-space:nowrap;background:{{ x.tagBg }};color:{{ x.tagFg }}">{{ x.status }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ hasNotified }}"><div style="display:flex;gap:8px;align-items:center;font-size:12px;color:#555"><i class="ph ph-bell-simple" style="font-size:16px"></i>{{ notifiedText }}</div></sc-if>
+      <button onClick="{{ done }}" style="height:48px;border-radius:9px;border:none;background:#141414;color:#fff;font-size:14px;font-weight:500;margin-top:4px">Done</button>
+    </div>
+
+    <div style="position:absolute;left:16px;right:16px;bottom:28px;z-index:20;display:flex;justify-content:center;pointer-events:none;transition:opacity .3s,transform .3s;opacity:{{ toastOp }};transform:{{ toastTf }}">
+      <div style="background:#141414;color:#fff;border-radius:12px;padding:10px 10px 10px 16px;font-size:13px;display:flex;gap:10px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.25);pointer-events:{{ toastPE }}"><i class="ph-fill {{ toastIcon }}" style="color:#EDC14E;font-size:16px"></i><span style="padding:2px 0">{{ toastText }}</span><sc-if value="{{ hasToastAction }}"><button onClick="{{ toastAction }}" style="display:flex;align-items:center;gap:6px;background:#fff;color:#141414;border:none;border-radius:8px;padding:7px 10px;font-size:12px;font-weight:500;white-space:nowrap" style-active="background:#E6E6E6"><i class="ph-bold ph-lock-simple-open" style="font-size:14px"></i>Unlock</button></sc-if></div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:#777;max-width:402px;text-align:center">Tap “Dinner” to start · ⋯ resets the demo</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultTiming&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;At unlock&quot;,&quot;Now&quot;],&quot;default&quot;:&quot;At unlock&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showMessage&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const META = {
+  lampara: { name: 'Lamp', icon: 'ph-lamp', kind: 'light', target: 30, room: 'Living room' },
+  altavoz: { name: 'Speaker 1', icon: 'ph-speaker-hifi', kind: 'speaker', target: 35, room: 'Living room' },
+  cocina: { name: 'Kitchen light', icon: 'ph-lamp-pendant', kind: 'light', target: 30, room: 'Kitchen' },
+};
+const IDS = ['lampara', 'altavoz', 'cocina'];
+const COLORS = { Nora: '#F1C9A5', Dani: '#C7D3F0', Leo: '#D8E6C8' };
+const INIT = () => ({
+  lampara: { on: true, val: 100, lock: { by: 'Nora', ago: '5 min ago', until: null } },
+  altavoz: { on: false, val: 0, lock: { by: 'Dani', ago: '30 min ago', until: '22:00' } },
+  cocina: { on: true, val: 100, lock: null, last: '19:40' },
+});
+const toM = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+const fromM = n => String(Math.floor(n / 60) % 24).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
+const fmt = (id, d) => META[id].kind === 'light' ? (d.on ? d.val + ' %' : 'Off') : (d.on ? 'On · ' + d.val + ' %' : 'Off');
+const fmtT = (id, v) => { v = v ?? META[id].target; return META[id].kind === 'light' ? (v ? v + ' %' : 'Off') : (v ? 'On · ' + v + ' %' : 'Off'); };
+
+class Component extends DCLogic {
+  state = this.fresh();
+  fresh() {
+    const def = (this.props && this.props.defaultTiming) === 'Now' ? 'now' : '22:00';
+    return { screen: 'home', dev: INIT(), sel: { lampara: false, altavoz: true, cocina: true },
+      timing: { lampara: 'now', altavoz: def, cocina: 'now' }, draft: {}, target: { lampara: 30, altavoz: 35, cocina: 30 }, open: null, result: null,
+      toast: null, pending: [], clock: '21:30' };
+  }
+  toast(t, action) { clearTimeout(this._t); this.setState({ toast: t, toastAct: action || null }); this._t = setTimeout(() => this.setState({ toast: null, toastAct: null }), action ? 5000 : 3200); }
+  unlock(id) {
+    this.setState(st => ({ dev: { ...st.dev, [id]: { ...st.dev[id], lock: null } } }));
+    this.toast(META[id].name + ' unlocked · tap it to change it');
+  }
+  componentDidMount() { this._fit = () => this.setState({ zoom: Math.min(1, (window.innerHeight - 90) / 894, (window.innerWidth - 32) / 422) }); this._fit(); window.addEventListener('resize', this._fit); }
+  componentWillUnmount() { clearTimeout(this._t); window.removeEventListener('resize', this._fit); }
+
+  defaultDraft(id) {
+    const t = this.state.timing[id], lock = this.state.dev[id].lock;
+    if (t !== 'now') return t;
+    return lock && lock.until ? lock.until : '21:45';
+  }
+  setDraft(id, v) { this.setState(st => ({ draft: { ...st.draft, [id]: v } })); }
+
+  apply(mode) {
+    const dev = JSON.parse(JSON.stringify(this.state.dev));
+    const rows = [], pending = [], notified = [];
+    let nNow = 0, nLater = 0, nKeep = 0;
+    IDS.forEach(id => {
+      const d = dev[id], m = META[id], lock = d.lock;
+      const base = { icon: m.icon, name: m.name };
+      const include = mode === 'unlock' || this.state.sel[id];
+      const t = mode === 'unlock' ? 'now' : this.state.timing[id];
+      if (!include) {
+        nKeep++;
+        rows.push({ ...base, value: fmt(id, d), status: 'Untouched', detail: lock ? 'Left as ' + lock.by + ' set it.' : 'Not included.', bg: '#F3F3F3', ic: '#8A8A8A', tagBg: '#F0F0F0', tagFg: '#6b6b6b' });
+      } else if (t === 'now') {
+        nNow++;
+        if (lock) d.lock = null;
+        const tv = this.state.target[id]; d.on = tv > 0; d.val = tv;
+        rows.push({ ...base, value: fmt(id, d), status: 'Done', detail: lock ? 'Unlocked. ' + lock.by + ' was using it.' : 'Applied now.', bg: '#141414', ic: '#EDC14E', tagBg: '#141414', tagFg: '#fff' });
+      } else {
+        nLater++;
+        pending.push({ id, time: t, by: lock && lock.by });
+        const early = lock && (!lock.until || toM(t) < toM(lock.until));
+        rows.push({ ...base, value: fmtT(id, this.state.target[id]), status: 'At ' + t,
+          detail: 'Turns on at ' + t + '.' + (early ? ' Before ' + lock.by + '’s lock ends.' : ''),
+          bg: '#FBF1D3', ic: '#9A6F00', tagBg: '#FBF1D3', tagFg: '#7A5800' });
+      }
+    });
+    const parts = [];
+    if (nNow) parts.push(nNow + ' now');
+    if (nLater) parts.push(nLater + ' scheduled');
+    if (nKeep) parts.push(nKeep + ' untouched');
+    const title = nNow === 3 ? 'Dinner is on.' : nNow === 0 ? 'Dinner, on hold.' : 'Dinner, without stepping on anyone.';
+    this.setState({ dev, pending, screen: 'result', result: { rows, title, sub: parts.join(' · '), notified, nNow, nLater } });
+  }
+
+  simulate() {
+    if (!this.state.pending.length) return;
+    const at = this.state.pending.map(p => p.time).sort((a, b) => toM(a) - toM(b))[0];
+    const dev = JSON.parse(JSON.stringify(this.state.dev));
+    const done = [], rest = [];
+    IDS.forEach(id => { const l = dev[id].lock; if (l && l.until && toM(l.until) <= toM(at)) dev[id].lock = null; });
+    this.state.pending.forEach(p => {
+      if (toM(p.time) <= toM(at)) { const tv = this.state.target[p.id]; dev[p.id].on = tv > 0; dev[p.id].val = tv; if (dev[p.id].lock) dev[p.id].lock = null; done.push(META[p.id].name); } else rest.push(p);
+    });
+    this.setState({ dev, pending: rest, clock: at });
+    this.toast("It's " + at + ' · ' + done.join(', ') + ' now on Dinner');
+  }
+
+  row(id) {
+    const s = this.state, d = s.dev[id], m = META[id], lock = d.lock;
+    const on = s.sel[id], t = s.timing[id], draft = s.draft[id] || this.defaultDraft(id);
+    const step = n => this.setDraft(id, fromM(Math.max(toM(s.clock) + 5, toM(draft) + n)));
+    return {
+      id, icon: m.icon, name: m.name, from: fmt(id, d), to: fmtT(id, s.target[id]), target: s.target[id], sceneVal: m.target,
+      modeOpen: s.open === 'mode:' + id && on, modeBg: s.open === 'mode:' + id ? '#F0F0F0' : 'transparent',
+      modeLabel: m.kind === 'light' ? 'Light brightness' : 'Music volume',
+      modeIcon: m.kind === 'light' ? 'ph-sun' : 'ph-speaker-simple-high',
+      onRange: e => { const v = +e.target.value; this.setState(st => ({ target: { ...st.target, [id]: v } })); },
+      presets: [0, 30, 50, 100].map(v => ({ label: v === 0 ? (m.kind === 'light' ? 'Off' : 'Mute') : v + ' %', bg: s.target[id] === v ? '#141414' : '#fff', fg: s.target[id] === v ? '#fff' : '#141414',
+        onClick: () => this.setState(st => ({ target: { ...st.target, [id]: v } })) })),
+      onMode: () => { if (s.sel[id]) this.setState(st => ({ open: st.open === 'mode:' + id ? null : 'mode:' + id })); },
+      onModeDone: () => this.setState({ open: null }),
+      avColor: lock ? COLORS[lock.by] : COLORS.Leo, avInitial: lock ? lock.by[0] : 'L',
+      pillPre: lock ? 'Locked by' : 'Last changed by', by: lock ? lock.by : 'Leo',
+      pillRest: lock ? lock.ago + (lock.until ? ' · until ' + lock.until : ' · no end time') : '· ' + d.last,
+      cbBorder: on ? '#141414' : '#141414', cbBg: on ? '#141414' : '#fff', cbOp: on ? 1 : 0, cbTf: on ? 'scale(1)' : 'scale(0.4)',
+      toOp: on ? 1 : 0.32, clockIcon: t === 'now' ? 'ph-clock' : 'ph-clock-countdown',
+      clockColor: t === 'now' ? '#9A9A9A' : '#9A6F00', when: t === 'now' ? 'Now' : t,
+      open: s.open === id && on,
+      isSched: t !== 'now', draft,
+      onMinus: () => step(-5), onPlus: () => step(5),
+      quick: ['21:45', '22:00', '22:30'].map(q => ({ label: q, bg: draft === q ? '#141414' : '#fff', fg: draft === q ? '#fff' : '#141414', onClick: () => this.setDraft(id, q) })),
+      onConfirm: () => this.setState(st => ({ timing: { ...st.timing, [id]: draft }, open: null })),
+      onClear: () => this.setState(st => ({ timing: { ...st.timing, [id]: 'now' }, open: null })),
+      hasNote: false,
+      note: !lock ? '' : t === 'now' ? lock.by + ' is using it.' : 'Before ' + lock.by + '’s lock ends.',
+      onToggle: () => this.setState(st => ({ sel: { ...st.sel, [id]: !st.sel[id] }, open: null })),
+      onClock: () => { if (s.sel[id]) this.setState(st => ({ open: st.open === id ? null : id, draft: { ...st.draft, [id]: this.defaultDraft(id) } })); },
+    };
+  }
+
+  card(id) {
+    const d = this.state.dev[id], lit = d.on;
+    return { value: fmt(id, d), locked: !!d.lock, bg: lit ? '#1C1C1C' : '#F3F3F3', fg: lit ? '#fff' : '#141414',
+      ic: lit ? '#EDC14E' : '#141414', sub: lit ? '#B5B5B5' : '#8A8A8A',
+      onClick: () => {
+        if (d.lock) return this.toast('Locked by ' + d.lock.by + (d.lock.until ? ' until ' + d.lock.until : ' · no end time'), () => this.unlock(id));
+        this.setState(st => ({ dev: { ...st.dev, [id]: { ...st.dev[id], on: !st.dev[id].on, val: st.dev[id].on ? 0 : 100 } } }));
+      } };
+  }
+
+  renderVals() {
+    const s = this.state, scr = s.screen, r = s.result;
+    const nSel = IDS.filter(i => s.sel[i]).length;
+    const nNow = IDS.filter(i => s.sel[i] && s.timing[i] === 'now').length;
+    const spkD = s.dev.altavoz, spkPend = s.pending.find(p => p.id === 'altavoz');
+    const lockedNow = IDS.some(i => s.dev[i].lock);
+    const hide = 'translateY(105%)', show = 'translateY(0)';
+    return {
+      clock: s.clock, zoom: s.zoom || 1,
+      stepLabel: { home: 'Home', alert: 'Step 1 of 3 · Alert', select: 'Step 2 of 3 · Choose', result: 'Step 3 of 3 · What happened' }[scr],
+      showMessage: this.props.showMessage ?? true,
+      lamp: this.card('lampara'), kit: this.card('cocina'),
+      spk: { locked: !!spkD.lock, unlocked: !spkD.lock, bar: spkD.on ? spkD.val + '%' : '0%',
+        sub: spkD.on ? 'Dinner · Leo’s playlist · ' + spkD.val + ' %' : spkPend ? 'Music at ' + s.target.altavoz + ' % at ' + spkPend.time : spkD.lock ? 'Quiet · until ' + spkD.lock.until : 'Not playing',
+        subIcon: spkD.on ? 'ph-speaker-simple-high' : spkPend ? 'ph-clock-countdown' : 'ph-speaker-simple-x',
+        noteColor: spkD.on ? '#EDC14E' : '#6b6b6b', onClick: this.card('altavoz').onClick },
+      hasPending: s.pending.length > 0 && scr === 'home',
+      pendingText: s.pending.map(p => META[p.id].name + ' at ' + p.time).join(' · '),
+      canSimulate: s.pending.length > 0,
+      simulateLabel: s.pending.length ? 'Simulate ' + s.pending.map(p => p.time).sort((a, b) => toM(a) - toM(b))[0] : '',
+      openCena: () => { if (lockedNow) this.setState({ screen: 'alert' }); else this.apply('unlock'); },
+      otherScene: () => this.toast('Only “Dinner” works in this demo'),
+      reset: () => { this.setState(this.fresh()); this.toast('Demo reset · 21:30'); },
+      dimOp: scr === 'home' ? 0 : 1, dimPE: scr === 'home' ? 'none' : 'auto',
+      backdropClick: () => { if (scr === 'alert') this.setState({ screen: 'home' }); },
+      alertOp: scr === 'alert' ? 1 : 0, alertPE: scr === 'alert' ? 'auto' : 'none',
+      alertTf: scr === 'alert' ? show : hide,
+      close: () => this.setState({ screen: 'home' }),
+      unlockAll: () => this.apply('unlock'),
+      goSelect: () => this.setState({ screen: 'select' }),
+      backToAlert: () => this.setState({ screen: 'alert', open: null }),
+      selTf: scr === 'select' ? show : hide,
+      rowsSalon: [this.row('lampara'), this.row('altavoz')], rowsCocina: [this.row('cocina')],
+      selSummary: nSel === 0 ? 'Nothing selected: the house stays as it is.' : nSel + ' of 3 devices · ' + nNow + ' now, ' + (nSel - nNow) + ' scheduled',
+      applyLabel: nSel ? 'Apply ' + nSel + (nSel === 1 ? ' change' : ' changes') : 'Apply', applyOp: nSel ? 1 : 0.35,
+      applySel: () => { if (nSel) this.apply('select'); },
+      resTf: scr === 'result' ? show : hide,
+      resTitle: r ? r.title : '', resSub: r ? r.sub : '', resRows: r ? r.rows : [],
+      hasNotified: !!(r && r.notified.length), notifiedText: r ? 'We notified ' + r.notified.join(' and ') + '.' : '',
+      done: () => { const x = this.state.result; this.setState({ screen: 'home' });
+        this.toast(x.nLater ? 'Dinner applied · ' + x.nLater + ' pending change' + (x.nLater > 1 ? 's' : '') : 'Dinner applied'); },
+      toastText: s.toast || '', hasToastAction: !!s.toastAct, toastAction: () => s.toastAct && s.toastAct(),
+      toastPE: s.toast ? 'auto' : 'none', toastIcon: s.toastAct ? 'ph-lock-simple' : 'ph-sparkle', toastOp: s.toast ? 1 : 0, toastTf: s.toast ? 'translateY(0)' : 'translateY(12px)',
+    };
+  }
+}
+</script>
+</body>
+</html>
