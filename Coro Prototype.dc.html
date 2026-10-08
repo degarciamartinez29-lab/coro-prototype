@@ -204,8 +204,14 @@ button{font-family:inherit;cursor:pointer}
                 <button onClick="{{ r.onConfirm }}" style="height:40px;border-radius:8px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:500">Schedule for {{ r.draft }}</button>
               </div>
             </sc-if>
-            <sc-if value="{{ r.hasNote }}">
-              <div style="margin-left:42px;display:flex;gap:6px;align-items:center;font-size:12px;color:#9A6F00"><i class="ph ph-warning-circle" style="font-size:15px"></i>{{ r.note }}</div>
+            <sc-if value="{{ r.hasRec }}">
+              <div style="margin-left:42px;display:flex;flex-direction:column;gap:10px;background:#FBF1D3;border:1px solid #EDC14E;border-radius:10px;padding:10px 12px">
+                <div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.4;color:#5C4300"><i class="ph-fill ph-lightbulb" style="font-size:16px;color:#C99A1E;flex-shrink:0"></i><span><b style="font-weight:600">Recommendation:</b> {{ r.recText }}</span></div>
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ r.onRecAccept }}" style="display:flex;align-items:center;gap:6px;height:32px;border-radius:8px;border:none;background:#141414;color:#fff;font-size:12px;font-weight:500;padding:0 12px" style-active="background:#333"><i class="ph ph-clock-countdown" style="font-size:14px"></i>{{ r.recBtn }}</button>
+                  <button onClick="{{ r.onRecDismiss }}" style="height:32px;border-radius:8px;border:1.5px solid #141414;background:transparent;font-size:12px;font-weight:500;padding:0 12px">Not now</button>
+                </div>
+              </div>
             </sc-if>
           </div>
         </sc-for>
@@ -331,9 +337,9 @@ const fmtT = (id, v) => { v = v ?? META[id].target; return META[id].kind === 'li
 class Component extends DCLogic {
   state = this.fresh();
   fresh() {
-    const def = (this.props && this.props.defaultTiming) === 'Now' ? 'now' : '22:00';
-    return { screen: 'home', dev: INIT(), sel: { lampara: false, altavoz: true, cocina: true },
-      timing: { lampara: 'now', altavoz: def, cocina: 'now' }, draft: {}, target: { lampara: 30, altavoz: 35, cocina: 30 }, open: null, result: null,
+    const def = 'now';
+    return { screen: 'home', dev: INIT(), sel: { lampara: false, altavoz: false, cocina: true },
+      timing: { lampara: 'now', altavoz: def, cocina: 'now' }, draft: {}, recDismissed: {}, target: { lampara: 30, altavoz: 35, cocina: 30 }, open: null, result: null,
       toast: null, pending: [], clock: '21:30' };
   }
   toast(t, action) { clearTimeout(this._t); this.setState({ toast: t, toastAct: action || null }); this._t = setTimeout(() => this.setState({ toast: null, toastAct: null }), action ? 5000 : 3200); }
@@ -417,7 +423,7 @@ class Component extends DCLogic {
       pillRest: lock ? lock.ago + (lock.until ? ' · until ' + lock.until : ' · no end time') : '· ' + d.last,
       cbBorder: on ? '#141414' : '#141414', cbBg: on ? '#141414' : '#fff', cbOp: on ? 1 : 0, cbTf: on ? 'scale(1)' : 'scale(0.4)',
       toOp: on ? 1 : 0.32, clockIcon: t === 'now' ? 'ph-clock' : 'ph-clock-countdown',
-      clockColor: t === 'now' ? '#9A9A9A' : '#9A6F00', when: t === 'now' ? 'Now' : t,
+      clockColor: t === 'now' ? '#9A9A9A' : '#9A6F00', when: t === 'now' ? (m.kind === 'speaker' ? '' : 'Now') : t,
       open: s.open === id && on,
       isSched: t !== 'now', draft,
       onMinus: () => step(-5), onPlus: () => step(5),
@@ -425,8 +431,13 @@ class Component extends DCLogic {
       onConfirm: () => this.setState(st => ({ timing: { ...st.timing, [id]: draft }, open: null })),
       onClear: () => this.setState(st => ({ timing: { ...st.timing, [id]: 'now' }, open: null })),
       hasNote: false,
+      hasRec: !!(on && lock && lock.until && t === 'now' && !s.recDismissed[id] && s.open !== id),
+      recText: lock && lock.until ? 'set a timer for ' + lock.until + ' so you don’t disturb ' + lock.by + '.' : '',
+      recBtn: lock && lock.until ? 'Set for ' + lock.until : '',
+      onRecAccept: () => this.setState(st => ({ timing: { ...st.timing, [id]: lock.until } })),
+      onRecDismiss: () => this.setState(st => ({ recDismissed: { ...st.recDismissed, [id]: true } })),
       note: !lock ? '' : t === 'now' ? lock.by + ' is using it.' : 'Before ' + lock.by + '’s lock ends.',
-      onToggle: () => this.setState(st => ({ sel: { ...st.sel, [id]: !st.sel[id] }, open: null })),
+      onToggle: () => this.setState(st => ({ sel: { ...st.sel, [id]: !st.sel[id] }, open: null, recDismissed: { ...st.recDismissed, [id]: false } })),
       onClock: () => { if (s.sel[id]) this.setState(st => ({ open: st.open === id ? null : id, draft: { ...st.draft, [id]: this.defaultDraft(id) } })); },
     };
   }
